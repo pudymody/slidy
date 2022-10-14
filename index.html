@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title></title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script type="module">
+			import MarkdownIt from "https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/+esm";
+			import gray_matter from "https://cdn.jsdelivr.net/npm/front-matter/+esm";
+
+			const md = new MarkdownIt();
+			const proxy = (tokens, idx, options, env, self) => self.renderToken(tokens, idx, options);
+			const defaultBulletListOpenRenderer = md.renderer.rules.bullet_list_open || proxy;
+			const defaultListItemOpenRenderer = md.renderer.rules.list_item_open || proxy;
+			const defaultParagraphOpenRenderer = md.renderer.rules.paragraph_open || proxy;
+			const defaultHeadingOpenRenderer = md.renderer.rules.heading_open || proxy;
+
+			md.renderer.rules.bullet_list_open = function(tokens, idx, options, env, self) {
+				 // Make your changes here ...
+				 tokens[idx].attrJoin("part", "ul");
+				 // ... then render it using the existing logic
+				 return defaultBulletListOpenRenderer(tokens, idx, options, env, self)
+			};
+
+			md.renderer.rules.list_item_open = function(tokens, idx, options, env, self) {
+				 // Make your changes here ...
+				 tokens[idx].attrJoin("part", "li");
+				 // ... then render it using the existing logic
+				 return defaultListItemOpenRenderer(tokens, idx, options, env, self)
+			};
+
+			md.renderer.rules.paragraph_open = function(tokens, idx, options, env, self) {
+				 // Make your changes here ...
+				 tokens[idx].attrJoin("part", "p");
+				 // ... then render it using the existing logic
+				 return defaultParagraphOpenRenderer(tokens, idx, options, env, self)
+			};
+
+			md.renderer.rules.heading_open = function(tokens, idx, options, env, self) {
+				 // Make your changes here ...
+				 tokens[idx].attrJoin("part", tokens[idx].tag);
+				 // ... then render it using the existing logic
+				 return defaultHeadingOpenRenderer(tokens, idx, options, env, self)
+			};
+
+			customElements.define("pudymody-slidy", class Slidy extends HTMLElement {
+				constructor(){
+					super();
+
+					// Create an observer instance linked to the callback function
+					this._observer = new MutationObserver((records, observer) => {
+						if( records[0]?.addedNodes[0]?.nodeType === 3 ){
+							let slides_markdown = this._parseContent(records[0].addedNodes[0].nodeValue); 
+							this.textContent = "";
+							this._shadowRoot.innerHTML += slides_markdown;
+						}
+					});
+					this._observer.observe(this, { childList: true, characterData: true });
+
+					this._shadowRoot = this.attachShadow({ mode: "closed" });
+					this._shadowRoot.innerHTML = `<style>
+						:host {
+							/* Sizes are designed to be in a 1024px canvas */
+							/* 1920px */
+							--_max-scaler: 1.875;
+
+							/* 320px */
+							--_min-scaler: 0.3125;
+
+							--aspect-ratio: 16/9;
+							--bg: #fff;
+							--bg-overlay: linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8));
+							--color: #111;
+							--font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+							--_width-slide: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
+
+							/* Size in pt, but unitless for calc */
+							--h1-size: 72;
+							--h1-size__min: calc( var(--h1-size) * var(--_min-scaler));
+							--h1-size__max: calc( var(--h1-size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--h1-size__fluid-slope: calc( (var(--h1-size__max) - var(--h1-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--h1-size__fluid-intercept: calc( var(--h1-size__min) - (var(--h1-size__fluid-slope) * 240));
+							--h1-size__fluid: calc( (var(--h1-size__fluid-slope) * var(--_width-slide)) + (var(--h1-size__fluid-intercept) * 1pt));
+							--h1-color: #111;
+
+							/* Size in pt, but unitless for calc */
+							--h2-size: 40;
+							--h2-size__min: calc( var(--h2-size) * var(--_min-scaler));
+							--h2-size__max: calc( var(--h2-size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--h2-size__fluid-slope: calc( (var(--h2-size__max) - var(--h2-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--h2-size__fluid-intercept: calc( var(--h2-size__min) - (var(--h2-size__fluid-slope) * 240));
+							--h2-size__fluid: calc( (var(--h2-size__fluid-slope) * var(--_width-slide)) + (var(--h2-size__fluid-intercept) * 1pt));
+							--h2-color: #111;
+
+							/* Size in pt, but unitless for calc */
+							--text-size: 24;
+							--text-size__min: calc( var(--text-size) * var(--_min-scaler));
+							--text-size__max: calc( var(--text-size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--text-size__fluid-slope: calc( (var(--text-size__max) - var(--text-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--text-size__fluid-intercept: calc( var(--text-size__min) - (var(--text-size__fluid-slope) * 240));
+							--text-size__fluid: calc( (var(--text-size__fluid-slope) * var(--_width-slide)) + (var(--text-size__fluid-intercept) * 1pt));
+
+							/* Size in pt, but unitless for calc */
+							--padding-size: 24;
+							--padding-size__min: calc( var(--padding-size) * var(--_min-scaler));
+							--padding-size__max: calc( var(--padding-size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--padding-size__fluid-slope: calc( (var(--padding-size__max) - var(--padding-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--padding-size__fluid-intercept: calc( var(--padding-size__min) - (var(--padding-size__fluid-slope) * 240));
+							--padding-size__fluid: calc( (var(--padding-size__fluid-slope) * var(--_width-slide)) + (var(--padding-size__fluid-intercept) * 1pt));
+							--padding: clamp( var(--padding-size__min) *1pt, var(--padding-size__fluid), var(--padding-size__max)*1pt );
+
+
+							--_is-height: clamp(0cqh,((100cqw * 9) - (100cqh * 16)) * 100,1cqh);
+							--_is-width: clamp(0cqw,((100cqw * 9) - (100cqh * 16)) * -100,1cqw);
+
+
+							scroll-snap-type: y mandatory;
+							overflow-y: auto;
+							overscroll-behavior-y: contain;
+							scrollbar-gutter: auto;
+
+							box-sizing: border-box;
+							display: block;
+							min-width: 320px;
+							aspect-ratio: var(--aspect-ratio);
+
+							container-type: size;
+							container-name: slide-container;
+						}
+
+						:host([no-scrollbar])::-webkit-scrollbar {
+							display: none;
+						}
+
+						:host([no-scrollbar]){
+							scrollbar-width: none;
+						}
+
+						section {
+							width: 100%;
+							height: 100%;
+							scroll-snap-align: center;
+							display: grid;
+							place-items: center;
+						}
+
+						section > .wrapper {
+							background-color: var(--bg);
+							display: flex;
+							flex-direction: column;
+							height: calc((var(--_is-height) * 100) + (var(--_is-width) * (9*100/16)));
+							width: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
+							box-sizing: border-box;
+							padding: var(--padding);
+							color: var(--color);
+							font-family: var(--font-family);
+							font-size: clamp( var(--text-size__min) *1pt, var(--text-size__fluid), var(--text-size__max)*1pt );
+							/* here because we cant query container from container itself? */
+						}
+
+						section.center > .wrapper {
+							justify-content: center;
+						}
+
+						section.bg-image > .wrapper {
+							background-image: var(--bg-image);
+							background-size: cover;
+							background-position: center;
+							background-repeat: no-repeat;
+						}
+
+						section.bg-contain > .wrapper {
+							background-size: contain;
+						}
+
+						section.bg-overlay > .wrapper {
+							background-image: var(--bg-overlay), var(--bg-image);
+						}
+
+						h1 {
+							color: var(--h1-color);
+							font-size: clamp( var(--h1-size__min) *1pt, var(--h1-size__fluid), var(--h1-size__max)*1pt );
+						}
+
+						h2 {
+							color: var(--h2-color);
+							font-size: clamp( var(--h2-size__min) *1pt, var(--h2-size__fluid), var(--h2-size__max)*1pt );
+						}
+
+						ul {
+							list-style-position: inside;
+						}
+
+						img, iframe, svg {
+							display: block;
+							max-width: 100%;
+							max-height: 100%;
+							object-fit: contain;
+						}
+					</style>`;
+				}
+
+				_parseContent(content){
+					return content.split("\n===\n")
+						.map( s => s.trim() )
+						.map( s => gray_matter(s) )
+						.map( ({attributes, body}) => ({ body: md.render(body), attributes }) )
+						.map( ({body, attributes}) => {
+							const section = document.createElement("section");
+							if( attributes.class ){
+								section.className = attributes.class;
+							}
+
+							if( attributes.bgImage ){
+								section.classList.add("bg-image")
+							}
+
+							["bgColor", "bgOverlay", "bgImage", "paddingSize", "h1Size", "h1Color", "h2Size", "h2Color", "textSize", "color", "fontFamily"].forEach(function(prop){
+								if( attributes[prop] ){
+									section.style.setProperty(`--${prop}`, attributes[prop]);
+								}
+							});
+
+							const wrapper = document.createElement("div");
+							wrapper.className = "wrapper";
+							wrapper.part = "slide";
+							wrapper.innerHTML = body;
+
+							section.appendChild(wrapper);
+							return section;
+						})
+				}
+
+				connectedCallback(){
+					let slides = this._parseContent(this.textContent); 
+					this.textContent = "";
+
+					for( let slide of slides ){
+						this._shadowRoot.appendChild(slide);
+					}
+				}
+			});
+		</script>
+		<style>
+			body {
+				margin: 0;
+			}
+			pudymody-slidy, body > div {
+				width: 100%;
+				height: 40vh;
+				background: #2a2b2b;
+				border: 1px solid red;
+			}
+
+			pudymody-slidy::part(h1), pudymody-slidy::part(h2), pudymody-slidy::part(p) {
+				text-align: center;
+				margin: 0;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<h1>TODO:</h1>
+		<ul>
+		<li>rework css custom properties to camelCase to allow them to be set in front matter.</li>
+		<li>make uses of aspect ratio custom property to be fully customizable</li>
+		</ul>
+		<pudymody-slidy no-scrollbar>
+---
+class: "center"
+---
+# Functional programming in Javascript
+
+===
+
+---
+class: "center bg-overlay"
+bgImage: "https://github.com/cassidoo/talks/blob/master/Fruit%20Stickers/fruitstickers.jpg?raw=true"
+---
+# Second slide
+## @pudymody
+This is a text inside a slide
+
+===
+---
+bg: "yellow"
+padding: 
+---
+# Title
+- 1
+- 2
+- 3
+- 4
+		</pudymody-slidy>
+	</body>
+</html>
