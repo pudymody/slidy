@@ -29,7 +29,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-This is a fully responsive css slide system. You can read more in my [blog post]()
+This is a fully responsive css slide system. You can read more in my [blog post](https://pudymody.netlify.app/blog/2022-10-14-fully-responsive-css-slide-system/) or view a [demo](https://pudymody.github.io/slidy) (currently only working in chrome and safari as it uses container queries)
 
 
 
