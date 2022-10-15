@@ -67,12 +67,15 @@
 							/* 320px */
 							--_min-scaler: 0.3125;
 
-							--_is-height: clamp(0cqh,((100cqw * 9) - (100cqh * 16)) * 100,1cqh);
-							--_is-width: clamp(0cqw,((100cqw * 9) - (100cqh * 16)) * -100,1cqw);
-							--_width-slide: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
-							--_height-slide: calc((var(--_is-height) * 100) + (var(--_is-width) * (9*100/16)));
+							--ratio-width: 16;
+							--ratio-height:9;
+							--aspect-ratio: var(--ratio-width)/var(--ratio-height);
 
-							--aspect-ratio: 16/9;
+							--_is-height: clamp(0cqh,((100cqw * var(--ratio-height)) - (100cqh * var(--ratio-width))) * 100,1cqh);
+							--_is-width: clamp(0cqw,((100cqw * var(--ratio-height)) - (100cqh * var(--ratio-width))) * -100,1cqw);
+							--_width-slide: calc((var(--_is-width) * 100) + (var(--_is-height) * (var(--ratio-width) * 100 / var(--ratio-height) )));
+							--_height-slide: calc((var(--_is-height) * 100) + (var(--_is-width) * (var(--ratio-height) * 100 / var(--ratio-width))));
+
 							--bgColor: #fff;
 							--bgOverlay: linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8));
 							--fontFamily: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -274,10 +277,6 @@
 		</style>
 	</head>
 	<body>
-		<h1>TODO:</h1>
-		<ul>
-		<li>make uses of aspect ratio custom property to be fully customizable</li>
-		</ul>
 		<pudymody-slidy no-scrollbar>
 ---
 class: "center"
