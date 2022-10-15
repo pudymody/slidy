@@ -53,8 +53,15 @@
 
 						if( records[0]?.addedNodes[0]?.nodeType === 3 ){
 							let slides_markdown = this._parseContent(records[0].addedNodes[0].nodeValue); 
-							this.textContent = "";
-							this._shadowRoot.innerHTML += slides_markdown;
+							this.innerHTML = "";
+
+							const slides = this._shadowRoot.querySelectorAll("section");
+							for(let s of slides){
+								s.remove();
+							}
+							for(let slide of slides_markdown){
+								this._shadowRoot.appendChild(slide);
+							}
 						}
 					});
 					this._observer.observe(this, { childList: true, characterData: true });
@@ -258,7 +265,7 @@
 				connectedCallback(){
 					if( this.getAttribute("parse") === null ){ return; }
 					let slides = this._parseContent(this.textContent); 
-					this.textContent = "";
+					this.innerHTML = "";
 
 					for( let slide of slides ){
 						this._shadowRoot.appendChild(slide);
@@ -268,14 +275,12 @@
 		</script>
 		<style>
 			body {
-				margin: 8px;
+				margin: 0;
 			}
 			pudymody-slidy {
-				max-width: 100%;
-				max-height: calc(100vh - 16px);
+				width: 100%;
+				height: 100vh;
 				background: #2a2b2b;
-				border: 1px solid red;
-				margin: 0 auto;
 			}
 
 			pudymody-slidy::part(h1), pudymody-slidy::part(h2), pudymody-slidy::part(p) {
