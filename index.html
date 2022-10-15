@@ -67,65 +67,30 @@
 							/* 320px */
 							--_min-scaler: 0.3125;
 
-							--aspect-ratio: 16/9;
-							--bg: #fff;
-							--bg-overlay: linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8));
-							--color: #111;
-							--font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-
-							--_width-slide: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
-
-							/* Size in pt, but unitless for calc */
-							--h1-size: 72;
-							--h1-size__min: calc( var(--h1-size) * var(--_min-scaler));
-							--h1-size__max: calc( var(--h1-size) * var(--_max-scaler));
-							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
-							/* 1200 = 1920px - 320px in pt */
-							--h1-size__fluid-slope: calc( (var(--h1-size__max) - var(--h1-size__min)) / 1200 );
-							/* 240 = 320px in pt */
-							--h1-size__fluid-intercept: calc( var(--h1-size__min) - (var(--h1-size__fluid-slope) * 240));
-							--h1-size__fluid: calc( (var(--h1-size__fluid-slope) * var(--_width-slide)) + (var(--h1-size__fluid-intercept) * 1pt));
-							--h1-color: #111;
-
-							/* Size in pt, but unitless for calc */
-							--h2-size: 40;
-							--h2-size__min: calc( var(--h2-size) * var(--_min-scaler));
-							--h2-size__max: calc( var(--h2-size) * var(--_max-scaler));
-							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
-							/* 1200 = 1920px - 320px in pt */
-							--h2-size__fluid-slope: calc( (var(--h2-size__max) - var(--h2-size__min)) / 1200 );
-							/* 240 = 320px in pt */
-							--h2-size__fluid-intercept: calc( var(--h2-size__min) - (var(--h2-size__fluid-slope) * 240));
-							--h2-size__fluid: calc( (var(--h2-size__fluid-slope) * var(--_width-slide)) + (var(--h2-size__fluid-intercept) * 1pt));
-							--h2-color: #111;
-
-							/* Size in pt, but unitless for calc */
-							--text-size: 24;
-							--text-size__min: calc( var(--text-size) * var(--_min-scaler));
-							--text-size__max: calc( var(--text-size) * var(--_max-scaler));
-							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
-							/* 1200 = 1920px - 320px in pt */
-							--text-size__fluid-slope: calc( (var(--text-size__max) - var(--text-size__min)) / 1200 );
-							/* 240 = 320px in pt */
-							--text-size__fluid-intercept: calc( var(--text-size__min) - (var(--text-size__fluid-slope) * 240));
-							--text-size__fluid: calc( (var(--text-size__fluid-slope) * var(--_width-slide)) + (var(--text-size__fluid-intercept) * 1pt));
-
-							/* Size in pt, but unitless for calc */
-							--padding-size: 24;
-							--padding-size__min: calc( var(--padding-size) * var(--_min-scaler));
-							--padding-size__max: calc( var(--padding-size) * var(--_max-scaler));
-							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
-							/* 1200 = 1920px - 320px in pt */
-							--padding-size__fluid-slope: calc( (var(--padding-size__max) - var(--padding-size__min)) / 1200 );
-							/* 240 = 320px in pt */
-							--padding-size__fluid-intercept: calc( var(--padding-size__min) - (var(--padding-size__fluid-slope) * 240));
-							--padding-size__fluid: calc( (var(--padding-size__fluid-slope) * var(--_width-slide)) + (var(--padding-size__fluid-intercept) * 1pt));
-							--padding: clamp( var(--padding-size__min) *1pt, var(--padding-size__fluid), var(--padding-size__max)*1pt );
-
-
 							--_is-height: clamp(0cqh,((100cqw * 9) - (100cqh * 16)) * 100,1cqh);
 							--_is-width: clamp(0cqw,((100cqw * 9) - (100cqh * 16)) * -100,1cqw);
+							--_width-slide: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
+							--_height-slide: calc((var(--_is-height) * 100) + (var(--_is-width) * (9*100/16)));
 
+							--aspect-ratio: 16/9;
+							--bgColor: #fff;
+							--bgOverlay: linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8));
+							--fontFamily: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+							/* Size in pt, but unitless for calc */
+							--h1Size: 72;
+							--h1Color: #111;
+
+							/* Size in pt, but unitless for calc */
+							--h2Size: 40;
+							--h2Color: #111;
+
+							/* Size in pt, but unitless for calc */
+							--textSize: 24;
+							--textColor: #111;
+
+							/* Size in pt, but unitless for calc */
+							--paddingSize: 24;
 
 							scroll-snap-type: y mandatory;
 							overflow-y: auto;
@@ -158,17 +123,35 @@
 						}
 
 						section > .wrapper {
-							background-color: var(--bg);
+							--text-size__min: calc( var(--textSize) * var(--_min-scaler));
+							--text-size__max: calc( var(--textSize) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--text-size__fluid-slope: calc( (var(--text-size__max) - var(--text-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--text-size__fluid-intercept: calc( var(--text-size__min) - (var(--text-size__fluid-slope) * 240));
+							--text-size__fluid: calc( (var(--text-size__fluid-slope) * var(--_width-slide)) + (var(--text-size__fluid-intercept) * 1pt));
+
+							--padding-size__min: calc( var(--paddingSize) * var(--_min-scaler));
+							--padding-size__max: calc( var(--paddingSize) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--padding-size__fluid-slope: calc( (var(--padding-size__max) - var(--padding-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--padding-size__fluid-intercept: calc( var(--padding-size__min) - (var(--padding-size__fluid-slope) * 240));
+							--padding-size__fluid: calc( (var(--padding-size__fluid-slope) * var(--_width-slide)) + (var(--padding-size__fluid-intercept) * 1pt));
+							--padding: clamp( var(--padding-size__min) *1pt, var(--padding-size__fluid), var(--padding-size__max)*1pt );
+
+							background-color: var(--bgColor);
 							display: flex;
 							flex-direction: column;
-							height: calc((var(--_is-height) * 100) + (var(--_is-width) * (9*100/16)));
-							width: calc((var(--_is-width) * 100) + (var(--_is-height) * (16*100/9)));
+							height: var(--_height-slide);
+							width: var(--_width-slide);
 							box-sizing: border-box;
 							padding: var(--padding);
-							color: var(--color);
-							font-family: var(--font-family);
+							color: var(--textColor);
+							font-family: var(--fontFamily);
 							font-size: clamp( var(--text-size__min) *1pt, var(--text-size__fluid), var(--text-size__max)*1pt );
-							/* here because we cant query container from container itself? */
 						}
 
 						section.center > .wrapper {
@@ -176,7 +159,7 @@
 						}
 
 						section.bg-image > .wrapper {
-							background-image: var(--bg-image);
+							background-image: var(--bgImage);
 							background-size: cover;
 							background-position: center;
 							background-repeat: no-repeat;
@@ -187,16 +170,34 @@
 						}
 
 						section.bg-overlay > .wrapper {
-							background-image: var(--bg-overlay), var(--bg-image);
+							background-image: var(--bgOverlay), var(--bgImage);
 						}
 
 						h1 {
-							color: var(--h1-color);
+							--h1-size__min: calc( var(--h1Size) * var(--_min-scaler));
+							--h1-size__max: calc( var(--h1Size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--h1-size__fluid-slope: calc( (var(--h1-size__max) - var(--h1-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--h1-size__fluid-intercept: calc( var(--h1-size__min) - (var(--h1-size__fluid-slope) * 240));
+							--h1-size__fluid: calc( (var(--h1-size__fluid-slope) * var(--_width-slide)) + (var(--h1-size__fluid-intercept) * 1pt));
+
+							color: var(--h1Color);
 							font-size: clamp( var(--h1-size__min) *1pt, var(--h1-size__fluid), var(--h1-size__max)*1pt );
 						}
 
 						h2 {
-							color: var(--h2-color);
+							--h2-size__min: calc( var(--h2Size) * var(--_min-scaler));
+							--h2-size__max: calc( var(--h2Size) * var(--_max-scaler));
+							/* https://www.smashingmagazine.com/2022/10/fluid-typography-clamp-sass-functions/ */
+							/* 1200 = 1920px - 320px in pt */
+							--h2-size__fluid-slope: calc( (var(--h2-size__max) - var(--h2-size__min)) / 1200 );
+							/* 240 = 320px in pt */
+							--h2-size__fluid-intercept: calc( var(--h2-size__min) - (var(--h2-size__fluid-slope) * 240));
+							--h2-size__fluid: calc( (var(--h2-size__fluid-slope) * var(--_width-slide)) + (var(--h2-size__fluid-intercept) * 1pt));
+
+							color: var(--h2Color);
 							font-size: clamp( var(--h2-size__min) *1pt, var(--h2-size__fluid), var(--h2-size__max)*1pt );
 						}
 
@@ -228,7 +229,7 @@
 								section.classList.add("bg-image")
 							}
 
-							["bgColor", "bgOverlay", "bgImage", "paddingSize", "h1Size", "h1Color", "h2Size", "h2Color", "textSize", "color", "fontFamily"].forEach(function(prop){
+							["bgColor", "bgOverlay", "bgImage", "paddingSize", "h1Size", "h1Color", "h2Size", "h2Color", "textSize", "textColor", "fontFamily"].forEach(function(prop){
 								if( attributes[prop] ){
 									section.style.setProperty(`--${prop}`, attributes[prop]);
 								}
@@ -275,12 +276,13 @@
 	<body>
 		<h1>TODO:</h1>
 		<ul>
-		<li>rework css custom properties to camelCase to allow them to be set in front matter.</li>
 		<li>make uses of aspect ratio custom property to be fully customizable</li>
 		</ul>
 		<pudymody-slidy no-scrollbar>
 ---
 class: "center"
+h1Size: 89
+h1Color: "red"
 ---
 # Functional programming in Javascript
 
@@ -288,7 +290,9 @@ class: "center"
 
 ---
 class: "center bg-overlay"
-bgImage: "https://github.com/cassidoo/talks/blob/master/Fruit%20Stickers/fruitstickers.jpg?raw=true"
+bgImage: "url('https://github.com/cassidoo/talks/blob/master/Fruit%20Stickers/fruitstickers.jpg?raw=true')"
+h2Size: 69
+h2Color: "green"
 ---
 # Second slide
 ## @pudymody
@@ -296,8 +300,11 @@ This is a text inside a slide
 
 ===
 ---
-bg: "yellow"
-padding: 
+bgColor: "yellow"
+textSize: 40
+textColor: "blue"
+paddingSize: 15
+fontFamily: "monospace"
 ---
 # Title
 - 1
