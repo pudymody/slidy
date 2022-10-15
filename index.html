@@ -49,6 +49,8 @@
 
 					// Create an observer instance linked to the callback function
 					this._observer = new MutationObserver((records, observer) => {
+						if( this.getAttribute("parse") === null ){ return; }
+
 						if( records[0]?.addedNodes[0]?.nodeType === 3 ){
 							let slides_markdown = this._parseContent(records[0].addedNodes[0].nodeValue); 
 							this.textContent = "";
@@ -214,7 +216,12 @@
 							max-height: 100%;
 							object-fit: contain;
 						}
-					</style>`;
+
+						pre {
+							max-width: 100%;
+							overflow-x: auto;
+						}
+					</style><slot></slot>`;
 				}
 
 				_parseContent(content){
@@ -249,6 +256,7 @@
 				}
 
 				connectedCallback(){
+					if( this.getAttribute("parse") === null ){ return; }
 					let slides = this._parseContent(this.textContent); 
 					this.textContent = "";
 
@@ -260,13 +268,14 @@
 		</script>
 		<style>
 			body {
-				margin: 0;
+				margin: 8px;
 			}
-			pudymody-slidy, body > div {
-				width: 100%;
-				height: 40vh;
+			pudymody-slidy {
+				max-width: 100%;
+				max-height: calc(100vh - 16px);
 				background: #2a2b2b;
 				border: 1px solid red;
+				margin: 0 auto;
 			}
 
 			pudymody-slidy::part(h1), pudymody-slidy::part(h2), pudymody-slidy::part(p) {
@@ -277,39 +286,85 @@
 		</style>
 	</head>
 	<body>
-		<pudymody-slidy no-scrollbar>
+		<pudymody-slidy no-scrollbar parse>
 ---
 class: "center"
-h1Size: 89
-h1Color: "red"
 ---
-# Functional programming in Javascript
+# Fully responsive CSS only slide system
 
 ===
 
 ---
-class: "center bg-overlay"
-bgImage: "url('https://github.com/cassidoo/talks/blob/master/Fruit%20Stickers/fruitstickers.jpg?raw=true')"
-h2Size: 69
-h2Color: "green"
+class: "center"
 ---
-# Second slide
-## @pudymody
-This is a text inside a slide
+# No Javascript needed
+*(only for parsing markdown if wanted)*
+
+*(currently only chrome and safari because container queries)*
+
+===
+
+# Fully customizable
+- setting css properties
+- settings front matter in markdown version
+- per slide or globally
+
+===
+
+# CSS Properties
+* --ratio-width: 16;
+* --ratio-height:9;
+* --bgColor: #fff;
+* --bgOverlay: linear-gradient(rgba(255,255,255,.8), rgba(255,255,255,.8));
+* --bgImage: url('')
+* --fontFamily: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+* --h1Size: 72;
+* --h1Color: #111;
+
+===
+
+* --h2Size: 40;
+* --h2Color: #111;
+* --textSize: 24;
+* --textColor: #111;
+* --paddingSize: 24;
+
+===
+
+# Also available as CSS part selectors
+* ::part(ul)
+* ::part(li)
+* ::part(p)
+* ::part(h1)
+* ::part(h2)
+
+===
+
+# Write with markdown
+
+```html
+&lt;pudymody-slidy no-scrollbar parse&gt;
+---
+class: &quot;center&quot;
+---
+&#35; Fully responsive CSS only slide system
+
+===
+
+# Or with HTML
+```html
+&lt;pudymody-slidy no-scrollbar&gt;
+&lt;section&gt;&lt;div class=&quot;wrapper&quot;&gt;# My title&lt;/div&gt;&lt;/section&gt;
+&lt;section&gt;&lt;div class=&quot;wrapper center&quot;&gt;# Slide 2&lt;/div&gt;&lt;/section&gt;
+&lt;/pudymody-slidy&gt;
+```
 
 ===
 ---
-bgColor: "yellow"
-textSize: 40
-textColor: "blue"
-paddingSize: 15
-fontFamily: "monospace"
+class: "center"
 ---
-# Title
-- 1
-- 2
-- 3
-- 4
+Read more on my [blog post](https://pudymody.netlify.app/blog/2022-10-14-fully-responsive-css-slide-system/) or the [source in github](https://github.com/pudymody/slidy)
+
 		</pudymody-slidy>
 	</body>
 </html>
